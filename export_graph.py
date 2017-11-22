@@ -13,8 +13,12 @@ from tensorflow.python.tools.freeze_graph import freeze_graph
 from model import CycleGAN
 import utils
 
+os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+
 FLAGS = tf.flags.FLAGS
 
+tf.flags.DEFINE_string('ckpt', '', 'checkpoint file to be load.')
 tf.flags.DEFINE_string('checkpoint_dir', '', 'checkpoints directory path')
 tf.flags.DEFINE_string('XtoY_model', 'apple2orange.pb', 'XtoY model name, default: apple2orange.pb')
 tf.flags.DEFINE_string('YtoX_model', 'orange2apple.pb', 'YtoX model name, default: orange2apple.pb')
@@ -43,8 +47,11 @@ def export_graph(model_name, XtoY=True):
 
   with tf.Session(graph=graph) as sess:
     sess.run(tf.global_variables_initializer())
-    latest_ckpt = tf.train.latest_checkpoint(FLAGS.checkpoint_dir)
-    restore_saver.restore(sess, latest_ckpt)
+    if FLAGS.ckpt is not None:
+        restore_saver.restore(sess, FLAGS.ckpt)
+    else:
+        latest_ckpt = tf.train.latest_checkpoint(FLAGS.checkpoint_dir)
+        restore_saver.restore(sess, latest_ckpt)
     output_graph_def = tf.graph_util.convert_variables_to_constants(
         sess, graph.as_graph_def(), [output_image.op.name])
 

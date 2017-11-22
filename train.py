@@ -6,6 +6,9 @@ import os
 import logging
 from utils import ImagePool
 
+os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
 FLAGS = tf.flags.FLAGS
 
 tf.flags.DEFINE_integer('batch_size', 1, 'batch size, default: 1')
