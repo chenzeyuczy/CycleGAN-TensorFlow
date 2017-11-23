@@ -8,6 +8,7 @@ __pycache__/
 
 # Cache files
 *.swp
+temp/
 
 # Distribution / packaging
 .Python
