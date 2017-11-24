@@ -5,6 +5,7 @@
 import numpy as np
 from PIL import Image
 from scipy import misc
+import os
 
 def get_ocllusion(img, color, chromatism=5):
 	H, W, _ = img.shape
@@ -33,16 +34,36 @@ def refine(in_img, guide_img):
 	return out_img
 
 def main():
-	input_path = 'data/input/035_004.jpg'
-	guide_path = 'data/output/035_004.jpg'
-	output_path = 'data/test_refine.jpg'
+	input_dir = '/home/zeyu/data/Partial-REID_Dataset/occluded_body_images'
+	guide_dir = 'data/Partial'
+	refine_dir = 'data/refine'
 
-	input_img = np.array(Image.open(input_path))
-	guide_img = np.array(Image.open(guide_path))
+	input_files = os.listdir(input_dir)
+	guide_files = os.listdir(guide_dir)
+	if not os.path.exists(refine_dir):
+		os.makedirs(refine_dir)
+	for filename in input_files:
+		if filename not in guide_files:
+			raise '{} not found in guide directory.'.format(filename)
+		input_file = os.path.join(input_dir, filename)
+		guide_file = os.path.join(guide_dir, filename)
+		output_file = os.path.join(refine_dir, filename)
 
-	output_img = refine(input_img, guide_img)
-	img = Image.fromarray(output_img)
-	img.save(output_path)
+		input_img = np.array(Image.open(input_file))
+		guide_img = np.array(Image.open(guide_file))
+		output_img = refine(input_img, guide_img)
+		Image.fromarray(output_img).save(output_file)
+
+#	input_path = 'data/input/035_004.jpg'
+#	guide_path = 'data/output/035_004.jpg'
+#	output_path = 'data/test_refine.jpg'
+#
+#	input_img = np.array(Image.open(input_path))
+#	guide_img = np.array(Image.open(guide_path))
+#
+#	output_img = refine(input_img, guide_img)
+#	img = Image.fromarray(output_img)
+#	img.save(output_path)
 	pass
 
 if __name__ == '__main__':

@@ -9,6 +9,7 @@ __pycache__/
 # Cache files
 *.swp
 temp/
+3rdparty/
 
 # Distribution / packaging
 .Python
