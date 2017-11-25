@@ -1,9 +1,9 @@
 #! /bin/bash
 
-data_root='/home/zeyu/data/MARS/mix_voc'
-X_input_dir=${data_root}'/mix'
+data_root='/home/zeyu/data/MARS/noise_pure'
+X_input_dir=${data_root}'/occlude'
 Y_input_dir=${data_root}'/label'
-X_output_file=${data_root}'/mix.tfrecords'
+X_output_file=${data_root}'/occlude.tfrecords'
 Y_output_file=${data_root}'/label.tfrecords'
 
 python build_data.py --X_input_dir ${X_input_dir} --Y_input_dir ${Y_input_dir} \
