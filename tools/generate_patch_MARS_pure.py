@@ -7,7 +7,6 @@ from PIL import Image
 # Setup configuration
 root_src = '/home/zeyu/data/MARS/bbox_train'
 root_dst = '/home/zeyu/data/MARS/noise_pure'
-label_file = os.path.join(root_dst, 'label.txt')
 root_occlude = os.path.join(root_dst, 'occlude')
 root_label = os.path.join(root_dst, 'label')
 label_color = (255, 255, 255)

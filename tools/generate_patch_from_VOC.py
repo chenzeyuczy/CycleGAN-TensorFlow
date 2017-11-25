@@ -75,7 +75,7 @@ def main():
 	occlude_root = '/home/zeyu/data/PascalVOC2007/VOCdevkit/VOC2007'
 	dst_root = '/home/zeyu/data/MARS/mix_voc_fullsize'
 
-	MAX_NUM = 10000
+	MAX_NUM = 40000
 	patch_w_ratio_min = 0.8
 	patch_w_ratio_max = 1.2
 	patch_h_ratio_min = 0.8

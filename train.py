@@ -11,6 +11,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 FLAGS = tf.flags.FLAGS
 
+tf.flags.DEFINE_float('gpu_fraction', None, 'per process gpu fraction, default: 1.0')
 tf.flags.DEFINE_integer('batch_size', 1, 'batch size, default: 1')
 tf.flags.DEFINE_integer('image_size', 256, 'image size, default: 256')
 tf.flags.DEFINE_bool('use_lsgan', True,
@@ -36,7 +37,6 @@ tf.flags.DEFINE_string('Y', 'data/tfrecords/orange.tfrecords',
                        'Y tfrecords file for training, default: data/tfrecords/orange.tfrecords')
 tf.flags.DEFINE_string('load_model', None,
                         'folder of saved model that you wish to continue training (e.g. 20170602-1936), default: None')
-
 
 def train():
   if FLAGS.load_model is not None:
@@ -71,7 +71,11 @@ def train():
     train_writer = tf.summary.FileWriter(checkpoints_dir, graph)
     saver = tf.train.Saver()
 
-  with tf.Session(graph=graph) as sess:
+  config = tf.ConfigProto()
+  if FLAGS.gpu_fraction > 0 and FLAGS.gpu_fraction < 1:
+    config.gpu_options.per_process_gpu_memory_fraction = FLAGS.gpu_fraction
+
+  with tf.Session(graph=graph, config=config) as sess:
     if FLAGS.load_model is not None:
       checkpoint = tf.train.get_checkpoint_state(checkpoints_dir)
       meta_graph_path = checkpoint.model_checkpoint_path + ".meta"
