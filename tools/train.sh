@@ -1,12 +1,12 @@
 #1 /bin/bash
 
 image_size=256
-DATA_ROOT=/home/zeyu/data/MARS/mix_voc_fullsize
-X=${DATA_ROOT}/mix.tfrecords
+DATA_ROOT=/home/zeyu/data/MARS/pure_patch_voc_fullsize
+X=${DATA_ROOT}/occlude.tfrecords
 Y=${DATA_ROOT}/label.tfrecords
 
-MODEL=checkpoints/20171125-2201
-MODEL_ITER=30000
+# MODEL=checkpoints/20171125-2201
+# MODEL_ITER=30000
 
 #GPU_FRACTION=1.0
 

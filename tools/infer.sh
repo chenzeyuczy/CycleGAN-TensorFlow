@@ -1,6 +1,6 @@
 #! /bin/bash
 
-ITER=1  # Time of iterations.
+ITER=5  # Time of iterations.
 MODEL=pretrained/occlude2white_voc_full_${ITER}w.pb
 INPUT_DIR=data/input/occluded_body_images
 OUTPUT_DIR=data/output/voc_full_${ITER}w

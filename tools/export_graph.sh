@@ -1,6 +1,6 @@
 #! /bin/bash
 
-ITER=1  # Time of iterations.
+ITER=5  # Time of iterations.
 CKPT_FILE=checkpoints/20171125-2201/model.ckpt-${ITER}0000
 X2Y_model=occlude2white_voc_full_${ITER}w.pb
 Y2X_model=white2occlude_voc_full_${ITER}w.pb
