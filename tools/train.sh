@@ -5,13 +5,21 @@ DATA_ROOT=/home/zeyu/data/MARS/mix_voc_fullsize
 X=${DATA_ROOT}/mix.tfrecords
 Y=${DATA_ROOT}/label.tfrecords
 
-GPU_DEVICE=1
+MODEL=checkpoints/20171125-2201
+MODEL_ITER=30000
+
 #GPU_FRACTION=1.0
 
 OPTION=""
 
-if [[ -n "GPU_FRACTION" ]]; then
-	OPTION="$OPTION --GPU_FRACTION ${GPU_FRACTION}"
+if [[ -n "${GPU_FRACTION}" ]]; then
+	OPTION="${OPTION} --gpu_fraction ${GPU_FRACTION}"
+fi
+if [[ -n "${MODEL}" ]]; then
+	OPTION="${OPTION} --load_model ${MODEL}"
+fi
+if [[ -n "${MODEL_ITER}" ]]; then
+	OPTION="${OPTION} --model_iter ${MODEL_ITER}"
 fi
 
 python train.py --X ${X} --Y ${Y} --image_size ${image_size} ${OPTION}

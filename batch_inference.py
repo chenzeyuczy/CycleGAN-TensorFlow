@@ -32,11 +32,8 @@ def inference():
     if not os.path.exists(FLAGS.output_dir):
       os.makedirs(FLAGS.output_dir)
     img_list = os.listdir(FLAGS.input_dir)
-    exist_list = os.listdir(FLAGS.output_dir)
 
     for img_name in img_list:
-      if img_name in exist_list:
-        continue
       img_path = os.path.join(FLAGS.input_dir, img_name)
       img_output = os.path.join(FLAGS.output_dir, img_name)
        
@@ -52,6 +49,7 @@ def inference():
       with open(img_output, 'wb') as f:
         f.write(generated)
 
+      # Resize image to its original size.
       img = Image.open(img_output)
       img.resize(img_size).save(img_output)
       img.close()

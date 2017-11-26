@@ -1,9 +1,10 @@
 #! /bin/bash
 
-MODEL=pretrained/occlude2white.pb
-INPUT_IMG=data/input/0017C4T0002F031.jpg
-OUTPUT_IMG=data/output/0017C4T0002F031.jpg
-IMAGE_SIZE=128
+ITER=1  # Time of iterations.
+MODEL=pretrained/occlude2white_voc_full_${ITER}w.pb
+INPUT_DIR=data/input/occluded_body_images
+OUTPUT_DIR=data/output/voc_full_${ITER}w
+IMAGE_SIZE=256
 
-python inference.py --model ${MODEL} --input ${INPUT_IMG} --output ${OUTPUT_IMG} \
+python batch_inference.py --model ${MODEL} --input_dir ${INPUT_DIR} --output_dir ${OUTPUT_DIR} \
 	--image_size ${IMAGE_SIZE}

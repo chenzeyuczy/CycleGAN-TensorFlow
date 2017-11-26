@@ -37,6 +37,8 @@ tf.flags.DEFINE_string('Y', 'data/tfrecords/orange.tfrecords',
                        'Y tfrecords file for training, default: data/tfrecords/orange.tfrecords')
 tf.flags.DEFINE_string('load_model', None,
                         'folder of saved model that you wish to continue training (e.g. 20170602-1936), default: None')
+tf.flags.DEFINE_integer('model_iter', 0,
+                        'iteration time of model to be load, default: 0')
 
 def train():
   if FLAGS.load_model is not None:
@@ -77,11 +79,18 @@ def train():
 
   with tf.Session(graph=graph, config=config) as sess:
     if FLAGS.load_model is not None:
-      checkpoint = tf.train.get_checkpoint_state(checkpoints_dir)
-      meta_graph_path = checkpoint.model_checkpoint_path + ".meta"
-      restore = tf.train.import_meta_graph(meta_graph_path)
-      restore.restore(sess, tf.train.latest_checkpoint(checkpoints_dir))
-      step = int(meta_graph_path.split("-")[2].split(".")[0])
+      if FLAGS.model_iter > 0:
+        step = FLAGS.model_iter
+        ckpt_path = os.path.join(FLAGS.load_model, 'model.ckpt-' + str(step))
+        meta_graph_path = ckpt_path + '.meta'
+        restore = tf.train.import_meta_graph(meta_graph_path)
+        restore.restore(sess, ckpt_path)
+      else:
+        checkpoint = tf.train.get_checkpoint_state(checkpoints_dir)
+        meta_graph_path = checkpoint.model_checkpoint_path + ".meta"
+        restore = tf.train.import_meta_graph(meta_graph_path)
+        restore.restore(sess, tf.train.latest_checkpoint(checkpoints_dir))
+        step = int(meta_graph_path.split("-")[2].split(".")[0])
     else:
       sess.run(tf.global_variables_initializer())
       step = 0
