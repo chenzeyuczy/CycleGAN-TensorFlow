@@ -1,7 +1,7 @@
 #1 /bin/bash
 
 image_size=256
-DATA_ROOT=/home/zeyu/data/MARS/pure_patch_voc_fullsize
+DATA_ROOT=/home/zeyu/data/MARS/mix_imagenet
 X=${DATA_ROOT}/occlude.tfrecords
 Y=${DATA_ROOT}/label.tfrecords
 

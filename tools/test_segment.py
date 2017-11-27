@@ -41,8 +41,57 @@ def get_heated_block(seg_map, heat_map):
 			seg_select.append(idx + 1)
 	return seg_select
 
-def block_spread(img, seg_map, seg_idx):
-	pass
+def block_spread(img, seg_map, seg_seed):
+	# Construct adjacent graph.
+	num_seg = np.max(seg_map)
+	H, W = seg_map.shape
+	adjacent_nodes = [set() for x in xrange(num_seg)]
+	neighbour = {}
+	neighbour['4'] = [[-1, 0], [0, -1], [1, 0], [0, 1]]
+	neighbour['8'] = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
+
+	neighbour_type = '4'
+	for i in xrange(H):
+		for j in xrange(W):
+			seg_idx = seg_map[i, j]
+			for offset in neighbour[neighbour_type]:
+				nei_y, nei_x = i + offset[0], j + offset[1]
+				if nei_y < 0 or nei_y >= H or nei_x < 0 or nei_x >= W:
+					continue
+				adjacent_nodes[seg_idx - 1].add(seg_map[nei_y, nei_x])
+
+	# Calculate average color feature in each block.
+	avg_color = [None for x in xrange(num_seg)]
+	for i in xrange(num_seg):
+		adjacent_nodes[i].remove(i + 1)
+		seg_pix = np.vstack(np.where(seg_map == (i + 1)))
+		avg_color[i] = np.mean(img[seg_pix[0], seg_pix[1], :], axis=0)
+
+	print(seg_seed, type(seg_seed))
+	seg_final = set(seg_seed)
+	seg_choose = set(seg_seed)
+
+	# Caution: It is quite hard to determine the threshold!
+	# Append adjacent blocks with similar apprearance with seed block into selection.
+	threshold = 12
+	for root_seg in seg_seed:
+		seg_choose = set([root_seg])
+		while True:
+			seg_new = set()
+			for child_seg in seg_choose:
+				for leaf_seg in adjacent_nodes[child_seg - 1]:
+					if leaf_seg in seg_new or leaf_seg in seg_choose:
+						continue
+					if np.linalg.norm(avg_color[leaf_seg - 1] - avg_color[child_seg - 1]) <= 		threshold:
+						seg_new.add(leaf_seg)
+			for child_seg in seg_new:
+				seg_choose.add(child_seg)
+			if len(seg_new) == 0:
+				break
+		for item in seg_choose:
+			seg_final.add(item)
+	print('{} new blocks added, {} blocks in total.'.format(len(seg_final) - len(seg_seed), 	len(seg_final)))
+	return sorted(list(seg_final))
 
 def fill_image(img, seg_map, seg_idx):
 	label_color = [255, 255, 255]
@@ -81,10 +130,11 @@ def main():
 	Image.fromarray(img_simple).save(path_simple)
 
 	seg_map = segment_image(img)
-	print(seg_map, min(seg_map.flatten()), max(seg_map.flatten()))
 	[H, W] = seg_map.shape
 	heated_block = get_heated_block(seg_map, img_guide)
 	print(heated_block)
+
+	heated_block = block_spread(img, seg_map, heated_block)
 	output_img = fill_image(img, seg_map, heated_block)
 	Image.fromarray(output_img).save(output_path)
 

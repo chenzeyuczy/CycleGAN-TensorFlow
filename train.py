@@ -71,7 +71,7 @@ def train():
 
     summary_op = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter(checkpoints_dir, graph)
-    saver = tf.train.Saver()
+    saver = tf.train.Saver(max_to_keep=None)
 
   config = tf.ConfigProto()
   if FLAGS.gpu_fraction > 0 and FLAGS.gpu_fraction < 1:
