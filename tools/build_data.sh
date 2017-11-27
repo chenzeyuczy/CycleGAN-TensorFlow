@@ -1,6 +1,6 @@
 #! /bin/bash
 
-data_root='/home/zeyu/data/MARS/noise'
+data_root='/home/zeyu/data/MARS/noise_multipatch'
 X_input_dir=${data_root}'/single_raw_patch'
 Y_input_dir=${data_root}'/single_raw_label'
 X_output_file=${data_root}'/occlude_non.tfrecords'
