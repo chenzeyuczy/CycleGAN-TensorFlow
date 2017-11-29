@@ -1,4 +1,4 @@
-#1 /bin/bash
+#! /bin/bash
 
 image_size=256
 DATA_ROOT=/home/zeyu/data/MARS/mix_imagenet
@@ -23,3 +23,4 @@ if [[ -n "${MODEL_ITER}" ]]; then
 fi
 
 python train.py --X ${X} --Y ${Y} --image_size ${image_size} ${OPTION}
+
