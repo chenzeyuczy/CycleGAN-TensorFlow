@@ -9,7 +9,7 @@ from skimage import filters as imfilter
 input_root = '/home/zeyu/data/MARS/bbox_train'
 patch_root = '/home/zeyu/data/imagenet_occlusion'
 output_dir = '/home/zeyu/data/MARS/mix_imagenet'
-label_color = [255, 255, 255]
+label_color = [128, 128, 128]
 
 input_dirs = os.listdir(input_root)
 patch_dirs = os.listdir(patch_root)
@@ -17,7 +17,7 @@ num_input_dir = len(input_dirs)
 num_patch_dir = len(patch_dirs)
 
 occlude_dir = os.path.join(output_dir, 'occlude')
-label_dir = os.path.join(output_dir, 'label')
+label_dir = os.path.join(output_dir, 'gray')
 raw_dir = os.path.join(output_dir, 'raw')
 
 # Create output directories.

@@ -3,7 +3,7 @@
 image_size=256
 DATA_ROOT=/home/zeyu/data/MARS/mix_imagenet
 X=${DATA_ROOT}/occlude.tfrecords
-Y=${DATA_ROOT}/label.tfrecords
+Y=${DATA_ROOT}/gray.tfrecords
 
 # MODEL=checkpoints/20171125-2201
 # MODEL_ITER=30000

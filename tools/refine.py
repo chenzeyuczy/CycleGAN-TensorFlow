@@ -7,7 +7,7 @@ from PIL import Image
 from scipy import misc
 import os
 
-from skimage.color import rgb2gray
+from skimage.color import rgb2gray, rgb2lab
 from skimage.filters import sobel
 from skimage.segmentation import watershed
 from skimage.util import img_as_float
@@ -21,7 +21,7 @@ def segment_image(img):
 
 def get_heated_block(seg_map, heat_map):
 	label_color = [255, 255, 255]
-	chromastism = 5
+	chromastism = 7
 	min_pix = 20
 	min_ratio = 0.4
 
@@ -43,7 +43,7 @@ def get_heated_block(seg_map, heat_map):
 			seg_select.append(idx + 1)
 	return seg_select
 
-def block_spread(img, seg_map, seg_seed):
+def block_propagate(img, seg_map, seg_seed):
 	# Construct adjacent graph.
 	num_seg = np.max(seg_map)
 	H, W = seg_map.shape
@@ -51,6 +51,7 @@ def block_spread(img, seg_map, seg_seed):
 	neighbour = {}
 	neighbour['4'] = [[-1, 0], [0, -1], [1, 0], [0, 1]]
 	neighbour['8'] = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
+	img_lab = rgb2lab(img)
 
 	neighbour_type = '4'
 	for i in xrange(H):
@@ -65,11 +66,10 @@ def block_spread(img, seg_map, seg_seed):
 	# Calculate average color feature in each block.
 	avg_color = [None for x in xrange(num_seg)]
 	for i in xrange(num_seg):
-		adjacent_nodes[i].remove(i + 1)
+		adjacent_nodes[i].discard(i + 1)
 		seg_pix = np.vstack(np.where(seg_map == (i + 1)))
-		avg_color[i] = np.mean(img[seg_pix[0], seg_pix[1], :], axis=0)
+		avg_color[i] = np.mean(img_lab[seg_pix[0], seg_pix[1], :], axis=0)
 
-	print(seg_seed, type(seg_seed))
 	seg_final = set(seg_seed)
 	seg_choose = set(seg_seed)
 
@@ -99,16 +99,20 @@ def fill_image(img, seg_map, seg_idx):
 	img[np.isin(seg_map, seg_idx), :] = label_color
 	return img
 
-def refine(input_img, guide_img):
+def refine(input_img, guide_img, flag_propagate=False):
 	seg_map = segment_image(input_img)
 	heated_block = get_heated_block(seg_map, guide_img)
+	if flag_propagate:
+		heated_block = block_propagate(input_img, seg_map, heated_block)
 	output_img = fill_image(input_img, seg_map, heated_block)
 	return output_img
 
 def main():
 	input_dir = 'data/input/occluded_body_images'
-	guide_dir = 'data/output/pure_3w'
-	refine_dir = 'data/refine/pure_3w'
+	model_name = 'imagenet_5w'
+	guide_dir = 'data/output/' + model_name
+	refine_dir = 'data/refine/' + model_name
+	flag_propagate=True
 
 	input_files = os.listdir(input_dir)
 	guide_files = os.listdir(guide_dir)
@@ -123,7 +127,7 @@ def main():
 
 		input_img = np.array(Image.open(input_file))
 		guide_img = np.array(Image.open(guide_file))
-		output_img = refine(input_img, guide_img)
+		output_img = refine(input_img, guide_img, flag_propagate)
 		Image.fromarray(output_img).save(output_file)
 
 #	input_path = 'data/input/035_004.jpg'

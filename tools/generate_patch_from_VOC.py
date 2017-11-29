@@ -22,7 +22,7 @@ def find_min_box(img):
 
 def mix_image(img_src, img_occlude_raw, img_occlude_anno, patch_box):
 # Function to mix original image with occluding image.
-	label_color = 255
+	label_color = 127
 	patch_x, patch_y, patch_w, patch_h = patch_box
 	# Resize patch to target size.
 	min_box = find_min_box(img_occlude_anno)
@@ -73,7 +73,7 @@ def main():
 	# Setup path and some other parameters.
 	src_root = '/home/zeyu/data/MARS/bbox_train'
 	occlude_root = '/home/zeyu/data/PascalVOC2007/VOCdevkit/VOC2007'
-	dst_root = '/home/zeyu/data/MARS/mix_voc_fullsize'
+	dst_root = '/home/zeyu/data/MARS/mix_voc_gray'
 
 	MAX_NUM = 40000
 	patch_w_ratio_min = 0.8
@@ -89,7 +89,7 @@ def main():
 	occlude_files = os.listdir(occlude_gt_folder)
 
 	folder_mix = os.path.join(dst_root, 'mix')
-	folder_label = os.path.join(dst_root, 'label')
+	folder_label = os.path.join(dst_root, 'gray')
 	if not os.path.exists(folder_mix):
 		os.makedirs(folder_mix)
 	if not os.path.exists(folder_label):
@@ -126,8 +126,8 @@ def main():
 		# Save result.
 		name_src = os.path.splitext(os.path.basename(src_img_path))[0]
 		name_occlude = os.path.splitext(os.path.basename(occlude_file))[0]
-		file_mix = '_'.join(['mix', name_src, name_occlude, '-'.join(map(str, patch_box))]) + '.jpg'
-		file_label = '_'.join(['label', name_src, name_occlude,	'-'.join(map(str, 	patch_box))]) + '.jpg'
+		file_mix = '_'.join(['mix', name_src, '-'.join(map(str, patch_box))]) + '.jpg'
+		file_label = '_'.join(['label', name_src, '-'.join(map(str, 	patch_box))]) + '.jpg'
 		path_mix = os.path.join(folder_mix, file_mix)
 		path_label = os.path.join(folder_label, file_label)
 		Image.fromarray(img_mix).save(path_mix)
