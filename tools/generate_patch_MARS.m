@@ -3,18 +3,18 @@
 disp('get path...');
 
 root_src = '~/data/MARS/bbox_train';
-root_dst = '~/data/MARS/noise_multipatch';
+root_dst = '~/data/MARS/raw_patch_gray';
 label_file = [root_dst, '/label.txt'];
-
-folder_src = dir(root_src);
-fid = fopen(label_file, 'w');
 
 if ~exist(root_dst, 'dir')
 	mkdir(root_dst);
 	mkdir([root_dst, '/whole']);
 	mkdir([root_dst, '/occlude'])
-	mkdir([root_dst, '/white'])
+	mkdir([root_dst, '/gray'])
 end
+
+folder_src = dir(root_src);
+fid = fopen(label_file, 'w');
 
 % Traversal along folder.
 for i=1:length(folder_src)-2
@@ -47,7 +47,7 @@ for i=1:length(folder_src)-2
 		patch_y = randi(H - patch_h + 1);
         im_occlude = im_data(patch_y: patch_y + patch_h - 1, patch_x:patch_x + patch_w - 1, :); 
         im_occlude_gray = im_occlude;
-        im_occlude_gray(:) = 256;
+        im_occlude_gray(:) = 128;
 %         imshow(im_occlude_gray);
 
 		occlude_type = randi(3);
@@ -115,7 +115,7 @@ for i=1:length(folder_src)-2
         end
         
         imwrite(im_data,[root_dst,'/occlude/', img_name]);
-        imwrite(im_data_gray,[root_dst,'/white/', img_name]);
+        imwrite(im_data_gray,[root_dst,'/gray/', img_name]);
 		if occlude_type < 3
 			fprintf(fid, '%s %d %d %d %d %d\n', img_name, occlude_type, occlude_x, occlude_y, occlude_w, occlude_h);
 		else

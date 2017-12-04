@@ -20,7 +20,7 @@ def segment_image(img):
 	return seg_map
 
 def get_heated_block(seg_map, heat_map):
-	label_color = [255, 255, 255]
+	label_color = [128, 128, 128]
 	chromastism = 7
 	min_pix = 20
 	min_ratio = 0.4
@@ -109,10 +109,10 @@ def refine(input_img, guide_img, flag_propagate=False):
 
 def main():
 	input_dir = 'data/input/occluded_body_images'
-	model_name = 'imagenet_5w'
+	model_name = 'voc_gray_8w'
 	guide_dir = 'data/output/' + model_name
 	refine_dir = 'data/refine/' + model_name
-	flag_propagate=True
+	flag_propagate=False
 
 	input_files = os.listdir(input_dir)
 	guide_files = os.listdir(guide_dir)
