@@ -14,7 +14,7 @@ from model import CycleGAN
 import utils
 
 os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 FLAGS = tf.flags.FLAGS
 
@@ -45,7 +45,9 @@ def export_graph(model_name, XtoY=True):
     restore_saver = tf.train.Saver()
     export_saver = tf.train.Saver()
 
-  with tf.Session(graph=graph) as sess:
+  config = tf.ConfigProto()
+  config.gpu_options.allow_growth = True
+  with tf.Session(graph=graph, config=config) as sess:
     sess.run(tf.global_variables_initializer())
     if FLAGS.ckpt is not None:
         restore_saver.restore(sess, FLAGS.ckpt)

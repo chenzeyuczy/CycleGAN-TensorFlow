@@ -1,6 +1,6 @@
 #! /bin/bash
 
-data_root='/home/zeyu/data/MARS/mix_imagenet'
+data_root='/home/zeyu/data/MARS/mix_voc_gray'
 X_input_dir=${data_root}'/occlude'
 Y_input_dir=${data_root}'/gray'
 X_output_file=${data_root}'/occlude.tfrecords'

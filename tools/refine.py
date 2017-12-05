@@ -20,8 +20,8 @@ def segment_image(img):
 	return seg_map
 
 def get_heated_block(seg_map, heat_map):
-	label_color = [128, 128, 128]
-	chromastism = 7
+	label_color = [127, 127, 127]
+	chromastism = 5
 	min_pix = 20
 	min_ratio = 0.4
 
@@ -109,26 +109,29 @@ def refine(input_img, guide_img, flag_propagate=False):
 
 def main():
 	input_dir = 'data/input/occluded_body_images'
-	model_name = 'voc_gray_8w'
-	guide_dir = 'data/output/' + model_name
-	refine_dir = 'data/refine/' + model_name
-	flag_propagate=False
 
-	input_files = os.listdir(input_dir)
-	guide_files = os.listdir(guide_dir)
-	if not os.path.exists(refine_dir):
-		os.makedirs(refine_dir)
-	for filename in input_files:
-		if filename not in guide_files:
-			raise '{} not found in guide directory.'.format(filename)
-		input_file = os.path.join(input_dir, filename)
-		guide_file = os.path.join(guide_dir, filename)
-		output_file = os.path.join(refine_dir, filename)
+	idx_begin, idx_end = 1, 11
+	for iter_time in range(idx_begin, idx_end):
+		model_name = 'voc_gray_' + str(iter_time) + 'w'
+		guide_dir = 'data/output/' + model_name
+		refine_dir = 'data/refine/' + model_name
+		flag_propagate=False
 
-		input_img = np.array(Image.open(input_file))
-		guide_img = np.array(Image.open(guide_file))
-		output_img = refine(input_img, guide_img, flag_propagate)
-		Image.fromarray(output_img).save(output_file)
+		input_files = os.listdir(input_dir)
+		guide_files = os.listdir(guide_dir)
+		if not os.path.exists(refine_dir):
+			os.makedirs(refine_dir)
+		for filename in input_files:
+			if filename not in guide_files:
+				raise '{} not found in guide directory.'.format(filename)
+			input_file = os.path.join(input_dir, filename)
+			guide_file = os.path.join(guide_dir, filename)
+			output_file = os.path.join(refine_dir, filename)
+
+			input_img = np.array(Image.open(input_file))
+			guide_img = np.array(Image.open(guide_file))
+			output_img = refine(input_img, guide_img, flag_propagate)
+			Image.fromarray(output_img).save(output_file)
 
 #	input_path = 'data/input/035_004.jpg'
 #	guide_path = 'data/output/035_004.jpg'

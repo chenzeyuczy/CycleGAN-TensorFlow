@@ -14,6 +14,9 @@ import numpy as np
 from PIL import Image
 from scipy import misc
 
+os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+
 FLAGS = tf.flags.FLAGS
 
 tf.flags.DEFINE_string('model', '', 'model path (.pb)')
@@ -43,7 +46,9 @@ def inference():
       img.close()
       input_image = misc.imresize(input_image, [FLAGS.image_size, FLAGS.image_size])
    
-      with tf.Session(graph=graph) as sess:
+      config = tf.ConfigProto()
+      config.gpu_options.allow_growth = True
+      with tf.Session(graph=graph, config=config) as sess:
         output_image = sess.run(['output_image:0'], feed_dict={'input_image:0': input_image})
         generated = output_image[0]
       with open(img_output, 'wb') as f:
