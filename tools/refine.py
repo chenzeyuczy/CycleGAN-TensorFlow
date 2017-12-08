@@ -109,13 +109,14 @@ def refine(input_img, guide_img, flag_propagate=False):
 
 def main():
 	input_dir = 'data/input/occluded_body_images'
+	model_prefix = 'imagenet_refined_gray'
 
-	idx_begin, idx_end = 1, 11
+	idx_begin, idx_end = 6, 10
+	flag_propagate=False
 	for iter_time in range(idx_begin, idx_end):
-		model_name = 'voc_gray_' + str(iter_time) + 'w'
+		model_name = model_prefix + '_' + str(iter_time) + 'w'
 		guide_dir = 'data/output/' + model_name
 		refine_dir = 'data/refine/' + model_name
-		flag_propagate=False
 
 		input_files = os.listdir(input_dir)
 		guide_files = os.listdir(guide_dir)

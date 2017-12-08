@@ -7,7 +7,7 @@ import logging
 from utils import ImagePool
 
 os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 FLAGS = tf.flags.FLAGS
 
@@ -76,6 +76,7 @@ def train():
   config = tf.ConfigProto()
   if FLAGS.gpu_fraction > 0 and FLAGS.gpu_fraction < 1:
     config.gpu_options.per_process_gpu_memory_fraction = FLAGS.gpu_fraction
+ # config.gpu_options.allow_growth = True
 
   with tf.Session(graph=graph, config=config) as sess:
     if FLAGS.load_model is not None:

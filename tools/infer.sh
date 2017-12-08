@@ -15,7 +15,7 @@ fi
 # Process in a loop.
 for ITER in `seq ${IDX_BEGIN} ${IDX_END}`
 do
-	MODEL_NAME=voc_gray
+	MODEL_NAME=imagenet_refined_gray
 	MODEL=pretrained/occlude2gray_${MODEL_NAME}_${ITER}w.pb
 	INPUT_DIR=data/input/occluded_body_images
 	OUTPUT_DIR=data/output/${MODEL_NAME}_${ITER}w

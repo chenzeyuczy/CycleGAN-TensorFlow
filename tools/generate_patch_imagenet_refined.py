@@ -8,8 +8,12 @@ from skimage import filters as imfilter
 
 input_root = '/home/zeyu/data/MARS/bbox_train'
 patch_root = '/home/zeyu/data/imagenet_occlusion'
-output_dir = '/home/zeyu/data/MARS/mix_imagenet_binary'
-label_color = [255, 255, 255]
+output_dir = '/home/zeyu/data/MARS/mix_imagenet_refined_gradient'
+label_color = 255
+label_color = 127
+
+# Occlusion type: 0-uppper half; 1-lower half; 2-left half; 3-right half
+occlusion_types = {'stem': [2, 3], 'office': [1], 'umbrella': [0, 1], 'wall': [1, 2, 3], 'plant': [0, 1], 'vehicle': [1]}
 
 input_dirs = os.listdir(input_root)
 patch_dirs = os.listdir(patch_root)
@@ -43,6 +47,9 @@ for input_dir in input_dirs:
 
 		while True:
 			patch_dir_idx = np.random.randint(num_patch_dir)
+			patch_type = patch_dirs[patch_dir_idx]
+			occlusion_type = np.random.choice(occlusion_types[patch_type])
+
 			patch_dir = patch_dirs[patch_dir_idx]
 			patch_file_idx = np.random.randint(len(patch_files[patch_dir_idx]))
 			patch_file = patch_files[patch_dir_idx][patch_file_idx]
@@ -60,28 +67,34 @@ for input_dir in input_dirs:
 		img_patch = imfilter.gaussian(img_patch, sigma=gaussian_sigma, multichannel=True)
 
 		img_occlude = img_input.copy()
-		img_label = np.zeros(img_input.shape, dtype=np.uint8)
+		img_label = img_input.copy()
+		img_alpha = np.ones(img_input.shape, dtype=np.float64)
+#		img_label = np.zeros(img_input.shape, dtype=np.uint8)
 
-		occlude_type = np.random.randint(2)
-		occlude_pos = np.random.randint(2)
+		occlude_pos = occlusion_type % 2
 
 		# Get bounding box of occluding patch.
 		# Horizonal occlusion.
-		if occlude_type == 0:
-			patch_w = np.random.randint(int(W * 0.6), W)
+		if occlusion_type < 2:
+			patch_w = np.random.randint(int(W * 0.7), W)
 			patch_h = np.random.randint(int(H * 0.3), int(H * 0.5))
 			patch_x = np.random.randint(W - patch_w)
-			patch_y = np.random.randint(int(H * 0.1)) + int(H * 0.9 - patch_h) * occlude_pos
+			patch_y = np.random.randint(int(H * 0.5 - patch_h)) + int(H * 0.5) * occlude_pos
 		# Vertical occlusion.
 		else:
 			patch_w = np.random.randint(int(W * 0.2), int(W * 0.4)) 
-			patch_h = np.random.randint(int(H * 0.6), H)
-			patch_x = np.random.randint(int(W * 0.1)) + int(W * 0.9 - patch_w) * occlude_pos
+			patch_h = np.random.randint(int(H * 0.7), H)
+			patch_x = np.random.randint(int(W * 0.5 - patch_w)) + int(W * 0.5) * occlude_pos
 			patch_y = np.random.randint(H - patch_h)
 
 		img_occlude[patch_y: patch_y + patch_h, patch_x: patch_x + patch_w, :] = \
 			imresize(img_patch, [patch_h, patch_w])
-		img_label[patch_y: patch_y + patch_h, patch_x: patch_x + patch_w, :] = label_color
+		img_alpha[patch_y: patch_y + patch_h, patch_x: patch_x + patch_w, :] = 0
+
+		gaussian_sigma = 9
+		img_alpha = imfilter.gaussian(img_alpha, sigma=gaussian_sigma, multichannel=True)
+		img_label = img_input.astype(np.float64) * img_alpha + label_color * (1 - img_alpha)
+		img_label = img_label.astype(np.uint8)
 
 		occlude_path = os.path.join(occlude_dir, input_file)
 		label_path = os.path.join(label_dir, input_file)
