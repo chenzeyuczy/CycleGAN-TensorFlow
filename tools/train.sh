@@ -1,7 +1,7 @@
 #! /bin/bash
 
 image_size=256
-DATA_ROOT=/home/zeyu/data/MARS/mix_imagenet_refined_gradient
+DATA_ROOT=/home/zeyu/data/MARS/mix_imagenet_refined_multiclass
 X=${DATA_ROOT}/occlude.tfrecords
 Y=${DATA_ROOT}/label.tfrecords
 

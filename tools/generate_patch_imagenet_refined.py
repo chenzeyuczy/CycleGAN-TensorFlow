@@ -8,12 +8,13 @@ from skimage import filters as imfilter
 
 input_root = '/home/zeyu/data/MARS/bbox_train'
 patch_root = '/home/zeyu/data/imagenet_occlusion'
-output_dir = '/home/zeyu/data/MARS/mix_imagenet_refined_gradient'
+output_dir = '/home/zeyu/data/MARS/mix_imagenet_refined_delicate'
 label_color = 255
 label_color = 127
 
 # Occlusion type: 0-uppper half; 1-lower half; 2-left half; 3-right half
-occlusion_types = {'stem': [2, 3], 'office': [1], 'umbrella': [0, 1], 'wall': [1, 2, 3], 'plant': [0, 1], 'vehicle': [1]}
+occlusion_types = {'stem': [2, 3], 'office': [1], 'umbrella': [0, 1], 'wall': [1, 2, 3], 'plant':
+[0, 1], 'leaf': [0, 1], 'chair': [1], 'door': [2, 3], 'vehicle': [1], 'person': [2, 3]}
 
 input_dirs = os.listdir(input_root)
 patch_dirs = os.listdir(patch_root)
@@ -36,7 +37,7 @@ for i in xrange(num_patch_dir):
 	patch_dir_path = os.path.join(patch_root, patch_dirs[i])
 	patch_files.append(os.listdir(patch_dir_path))
 
-max_img_per_dir = 50
+max_img_per_dir = 35
 count_dir = 0
 for input_dir in input_dirs:
 	input_dir_path = os.path.join(input_root, input_dir)

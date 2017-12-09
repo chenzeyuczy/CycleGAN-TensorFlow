@@ -1,6 +1,6 @@
 #! /bin/bash
 
-data_root='/home/zeyu/data/MARS/mix_imagenet_refined_gradient'
+data_root='/home/zeyu/data/MARS/mix_imagenet_refined_delicate'
 X_input_dir=${data_root}'/occlude'
 Y_input_dir=${data_root}'/label'
 X_output_file=${data_root}'/occlude.tfrecords'
