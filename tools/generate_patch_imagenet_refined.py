@@ -37,7 +37,7 @@ for i in xrange(num_patch_dir):
 	patch_dir_path = os.path.join(patch_root, patch_dirs[i])
 	patch_files.append(os.listdir(patch_dir_path))
 
-max_img_per_dir = 35
+max_img_per_dir = 40
 count_dir = 0
 for input_dir in input_dirs:
 	input_dir_path = os.path.join(input_root, input_dir)
