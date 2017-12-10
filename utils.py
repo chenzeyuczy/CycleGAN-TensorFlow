@@ -30,6 +30,33 @@ def batch_convert2float(images):
   """
   return tf.map_fn(convert2float, images, dtype=tf.float32)
 
+def image_padding(img):
+  """ Pad image to square.
+  Args:
+    img: 3D numpy array, image to be padded.
+  Returns:
+    img_target: 3D numpy array, image after padding.
+  """
+  h, w, _ = img.shape  # Size of image: (128, 64, 3)
+  padding = (h - w) / 2  # height > width
+  side = h
+  img_target = np.zeros(shape=(side, side, 3), dtype=img.dtype)
+  img_target[:, padding: padding + w, :] = img
+  return img_target
+
+def image_cropping(img, central_width):
+  """
+  Args:
+    image: 3D numpy array, image to be cropped.
+	central_width: int, width of patch to select.
+  Returns:
+    img_target: 3D numpy array, image after cropping.
+  """
+  h, w, _ = img.shape
+  padding = (w - central_width) / 2
+  img_target = img[:, padding: padding + central_width, :]
+  return img_target
+
 class ImagePool:
   """ History of generated images
       Same logic as https://github.com/junyanz/CycleGAN/blob/master/util/image_pool.lua

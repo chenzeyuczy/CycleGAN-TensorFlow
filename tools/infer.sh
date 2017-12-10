@@ -12,8 +12,8 @@ else
 	IDX_END=${DEFAULT_ITER}
 fi
 
-MODEL_NAME=imagenet_refined_gray
-DATASET=Occluded_REID
+MODEL_NAME=imagenet_refined_delicate
+DATASET=Partial_REID
 #	INPUT_DIR=data/input/occluded_body_images
 INPUT_DIR=data/input/${DATASET}
 IMAGE_SIZE=256
