@@ -76,16 +76,16 @@ def on_key(event, img, seg_map, selections, output_path):
 input_root = '/home/zeyu/data/Partial-REID_Dataset/occluded_body_images'
 output_root = '/home/zeyu/data/Partial-REID_Dataset/occlusion_label'
 
-idx_strat, idx_end = 0, -1
+idx_start, idx_end = 0, -1
 
 if not os.path.exists(output_root):
 	os.makedirs(output_root)
 
 filenames = sorted(os.listdir(input_root))
-for filename in filenames[idx_start, idx_end]:
+for filename in filenames[idx_start: idx_end]:
 	input_path = os.path.join(input_root, filename)
 	output_path = os.path.join(output_root, filename)
-	img = np.array(Image.open(img_path))
+	img = np.array(Image.open(input_path))
 	img_label = img.copy()
 
 	gradient = sobel(rgb2gray(img_as_float(img)))
