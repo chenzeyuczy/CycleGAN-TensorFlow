@@ -15,8 +15,8 @@ fi
 # Process in a loop.
 for ITER in `seq ${IDX_BEGIN} ${IDX_END}`
 do
-	CKPT_FILE=checkpoints/20171207-1339/model.ckpt-${ITER}0000
-	MODEL_PREFIX=imagenet_refined_gray
+	CKPT_FILE=checkpoints/20171211-0129/model.ckpt-${ITER}0000
+	MODEL_PREFIX=imagenet_cuhk01_square
 	X2Y_model=occlude2gray_${MODEL_PREFIX}_${ITER}w.pb
 	Y2X_model=gray2occlude_${MODEL_PREFIX}_${ITER}w.pb
 	image_size=256

@@ -99,52 +99,103 @@ def fill_image(img, seg_map, seg_idx):
 	img[np.isin(seg_map, seg_idx), :] = label_color
 	return img
 
-def refine(input_img, guide_img, flag_propagate=False):
-	seg_map = segment_image(input_img)
-	heated_block = get_heated_block(seg_map, guide_img)
-	if flag_propagate:
-		heated_block = block_propagate(input_img, seg_map, heated_block)
-	output_img = fill_image(input_img, seg_map, heated_block)
-	return output_img
+def get_selection(img, seg_map, seg_idx):
+# Function to get selection occording to segment indices.
+	label_color = 255
+	h, w, _ = img.shape
+	img_res = np.zeros((h, w), dtype=np.uint8)
+	img_res[np.isin(seg_map, seg_idx)] = label_color
+	return img_res
+	
+def get_performance(img1, img2, label1=255, label2=255):
+	assert(img1.shape == img2.shape)
+	num_pre = np.sum(img1 == label1)
+	num_gt = np.sum(img2 == label2)
+	num_inter = np.sum(np.logical_and(img1 == label1, img2 == label2))
+	num_union = np.sum(np.logical_or(img1 == label1, img2 == label2))
+
+	if num_union > 0:
+		iou = 1.0 * num_inter / num_union
+	else:
+		iou = 0.0
+	if num_pre > 0:
+		precision = 1.0 * num_inter / num_pre
+	else:
+		precision = 0.0
+	if num_gt > 0:
+		recall = 1.0 * num_inter / num_gt
+	else:
+		recall = 0.0
+	return (precision, recall, iou)
 
 def main():
-	dataset = 'Partial_REID'
-	input_dir = 'data/input/' + dataset + '/occluded_body_images'
-	model_prefix = 'imagenet_delicate_square'
+	dataset_name = 'Partial_REID'
+	input_dir = 'data/input/' + dataset_name + '/occluded'
+	input_dir = 'data/input/' + dataset_name + '/occlusion_label'
+	model_prefix = 'imagenet_cuhk01_square'
 
-	idx_begin, idx_end = 1, 21
-	flag_propagate=False
+	idx_begin, idx_end = 1, 12
+	label_occlusion, label_person, label_select = 255, 127, 255
+	flag_propagate = False
+	flag_export = False
+
 	for iter_time in range(idx_begin, idx_end):
 		model_name = model_prefix + '_' + str(iter_time) + 'w'
-		guide_dir = 'data/output/' + model_name + '/' + dataset
-		refine_dir = 'data/refine/' + model_name + '/' + dataset
+		guide_dir = 'data/output/' + model_name + '/' + dataset_name
+
+		if flag_export:
+			output_dir = 'data/refine/' + model_name + '/' + dataset_name
+			if not os.path.exists(output_dir):
+				os.makedirs(output_dir)
 
 		input_files = os.listdir(input_dir)
 		guide_files = os.listdir(guide_dir)
-		if not os.path.exists(refine_dir):
-			os.makedirs(refine_dir)
+		label_files = os.listdir(label_dir)
+
+		occlusion_precison = []
+		occlusion_recall = []
+		person_precision = []
+		person_recall = []
+
 		for filename in input_files:
 			if filename not in guide_files:
-				raise '{} not found in guide directory.'.format(filename)
+				print('{} not found in guide directory.'.format(filename))
+				continue
+			if filename not in label_files:
+				print('{} not found in label directory.'.format(filename))
+				continue
+
 			input_file = os.path.join(input_dir, filename)
 			guide_file = os.path.join(guide_dir, filename)
-			output_file = os.path.join(refine_dir, filename)
+			label_file = os.path.join(label_dir, filename)
 
 			input_img = np.array(Image.open(input_file))
 			guide_img = np.array(Image.open(guide_file))
-			output_img = refine(input_img, guide_img, flag_propagate)
-			Image.fromarray(output_img).save(output_file)
+			label_img = np.array(Image.open(label_file))
 
-#	input_path = 'data/input/035_004.jpg'
-#	guide_path = 'data/output/035_004.jpg'
-#	output_path = 'data/test_refine.jpg'
-#
-#	input_img = np.array(Image.open(input_path))
-#	guide_img = np.array(Image.open(guide_path))
-#
-#	output_img = refine(input_img, guide_img)
-#	img = Image.fromarray(output_img)
-#	img.save(output_path)
+			seg_map = segment_image(input_img)
+			heated_block = get_heated_block(seg_map, guide_img)
+			if flag_propagate:
+				heated_block = block_propagate(input_img, seg_map, heated_block)
+
+			if flag_export:
+				img_output = fill_image(input_img, seg_map, heated_block)
+				path_output = os.path.join(output_dir, filename)
+				Image.fromarray(img_output, path_output)
+
+			img_select = get_selection(input_img, seg_map, heated_block)
+			occlusion_rate = get_performance(img_select, label_img, label_select, label_occlusion)
+			person_rate = get_performance(img_select, label_img, label_select, label_person)
+
+			occlusion_precison.append(occlusion_rate[0])
+			occlusion_recall.append(occlusion_rate[1])
+			person_precision.append(person_rate[0])
+			person_recall.append(person_rate[1])
+
+		print('Model: %s' % model_name)
+		print('Occlusion Precision: %f\t Occlusion Recall: %f' % (np.mean(occlusion_precison), np.mean(occlusion_recall)))
+		print('Person Precision: %f\t Person Recall: %f' % (np.mean(person_precision), np.mean(person_recall)))
+
 	pass
 
 if __name__ == '__main__':
