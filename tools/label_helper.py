@@ -5,11 +5,9 @@ import numpy as np
 from PIL import Image
 import os
 
-from skimage.data import astronaut
 from skimage.color import rgb2gray
 from skimage.filters import sobel
-from skimage.segmentation import felzenszwalb, slic, quickshift, watershed
-from skimage.segmentation import mark_boundaries
+from skimage.segmentation import watershed, mark_boundaries
 from skimage.util import img_as_float
 
 def on_click(event, img, seg_map, selections):
@@ -69,14 +67,13 @@ def on_key(event, img, seg_map, selections, output_path):
 			selection.clear()
 		plt.imshow(mark_boundaries(img, seg_map))
 		fig.canvas.draw()
-	print(type(event.key))
 	print('You pressed', event.key, event.xdata, event.ydata)
 
 
 input_root = '/home/zeyu/data/Partial-REID_Dataset/occluded_body_images'
 output_root = '/home/zeyu/data/Partial-REID_Dataset/occlusion_label'
 
-idx_start, idx_end = 0, -1
+idx_start, idx_end = 125, 200
 
 if not os.path.exists(output_root):
 	os.makedirs(output_root)
@@ -104,7 +101,6 @@ for filename in filenames[idx_start: idx_end]:
 	fig.canvas.mpl_connect('key_press_event', lambda event: on_key(event, img, segments_watershed, selections, output_path))
 
 	imgplt = plt.imshow(mark_boundaries(img, segments_watershed))
-#imgplt.set_title('Compact watershed')
 
 	plt.tight_layout()
 	plt.show()

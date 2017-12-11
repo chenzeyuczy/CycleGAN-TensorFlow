@@ -12,11 +12,18 @@ else
 	IDX_END=${DEFAULT_ITER}
 fi
 
-MODEL_NAME=imagenet_refined_delicate
+MODEL_NAME=imagenet_delicate_square
 DATASET=Partial_REID
 #	INPUT_DIR=data/input/occluded_body_images
 INPUT_DIR=data/input/${DATASET}
 IMAGE_SIZE=256
+PAD_AND_CROP=1
+
+OPTION=""
+if [[ -n ${PAD_AND_CROP} ]]
+then
+	OPTION="${OPTION} --padi_and_crop ${PAD_AND_CROP}"
+fi
 
 # Process in a loop.
 for ITER in `seq ${IDX_BEGIN} ${IDX_END}`
@@ -24,6 +31,6 @@ do
 	MODEL=pretrained/occlude2gray_${MODEL_NAME}_${ITER}w.pb
 	OUTPUT_DIR=data/output/${MODEL_NAME}_${ITER}w/${DATASET}
 
-	python batch_inference.py --model ${MODEL} --input_dir ${INPUT_DIR} --output_dir ${OUTPUT_DIR} \
-		--image_size ${IMAGE_SIZE}
+	python batch_inference_pad_crop.py --model ${MODEL} --input_dir ${INPUT_DIR} --output_dir ${OUTPUT_DIR} \
+		--image_size ${IMAGE_SIZE} ${OPTION}
 done

@@ -1,8 +1,8 @@
 """Translate an image to another image
 An example of command-line usage is:
-python export_graph.py --model pretrained/apple2orange.pb \
-                       --input input_sample.jpg \
-                       --output output_sample.jpg \
+python batch_inference.py --model pretrained/apple2orange.pb \
+                       --input_dir input_sample_dir \
+                       --output_dir output_sample_dir \
                        --image_size 256
 """
 
@@ -23,6 +23,7 @@ tf.flags.DEFINE_string('model', '', 'model path (.pb)')
 tf.flags.DEFINE_string('input_dir', 'input_sample_dir', 'directory of input image')
 tf.flags.DEFINE_string('output_dir', 'output_sample_dir', 'directory of output image path')
 tf.flags.DEFINE_integer('image_size', '256', 'image size, default: 256')
+tf.flags.DEFINE_boolean('pad_and_crop', False, 'flag to pad and crop image when IO, default: False')
 
 def inference():
   graph = tf.Graph()
@@ -44,8 +45,10 @@ def inference():
       img_size = img.size
       input_image = np.array(img)
       img.close()
+      if FLAGS.pad_and_crop:
+        input_image = utils.image_padding(input_image)
       input_image = misc.imresize(input_image, [FLAGS.image_size, FLAGS.image_size])
-   
+     
       config = tf.ConfigProto()
       config.gpu_options.allow_growth = True
       with tf.Session(graph=graph, config=config) as sess:
@@ -53,9 +56,14 @@ def inference():
         generated = output_image[0]
       with open(img_output, 'wb') as f:
         f.write(generated)
-
-      # Resize image to its original size.
-      img = Image.open(img_output)
+  
+        # Resize image to its original size.
+        img = Image.open(img_output)
+      if FLAGS.pad_and_crop:
+        img_input = np.array(img)
+        crop_width = min(img_size)
+        img_input = utils.image_cropping(img_input, crop_width)
+        img = Image.fromarray(img_input)
       img.resize(img_size).save(img_output)
       img.close()
 
