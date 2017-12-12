@@ -31,12 +31,10 @@ def get_heated_block(seg_map, heat_map):
 	pix_seg = [0 for x in xrange(num_seg)]
 	seg_select = []
 
-	for i in xrange(H):
-		for j in xrange(W):
-			seg_idx = seg_map[i, j]
-			pix_seg[seg_idx - 1] += 1
-			if np.all(np.abs(heat_map[i, j, :] - label_color) < chromastism):
-				count_seg[seg_idx - 1] += 1
+	heat_map = np.abs(heat_map - label_color)
+	for idx in xrange(num_seg):
+		pix_seg[idx] = np.sum(seg_map == (idx + 1))
+		count_seg[idx] = np.sum(np.all(heat_map[seg_map == (idx + 1)] < chromastism, axis=-1))
 
 	for idx in xrange(num_seg):
 		if count_seg[idx] >= min_pix or (float(count_seg[idx]) / pix_seg[idx]) >= min_ratio:

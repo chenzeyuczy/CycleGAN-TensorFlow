@@ -1,5 +1,6 @@
 import tensorflow as tf
 import random
+import numpy as np
 
 def convert2int(image):
   """ Transfrom from float tensor ([-1.,1.]) to int image ([0,255])

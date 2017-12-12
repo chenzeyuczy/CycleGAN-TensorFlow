@@ -31,12 +31,10 @@ def get_heated_block(seg_map, heat_map):
 	pix_seg = [0 for x in xrange(num_seg)]
 	seg_select = []
 
-	for i in xrange(H):
-		for j in xrange(W):
-			seg_idx = seg_map[i, j]
-			pix_seg[seg_idx - 1] += 1
-			if np.all(np.abs(heat_map[i, j, :] - label_color) < chromastism):
-				count_seg[seg_idx - 1] += 1
+	heat_map = np.abs(heat_map - label_color)
+	for idx in xrange(num_seg):
+		pix_seg[idx] = np.sum(seg_map == (idx + 1))
+		count_seg[idx] = np.sum(np.all(heat_map[seg_map == (idx + 1)] < chromastism, axis=-1))
 
 	for idx in xrange(num_seg):
 		if count_seg[idx] >= min_pix or (float(count_seg[idx]) / pix_seg[idx]) >= min_ratio:
@@ -84,7 +82,7 @@ def block_propagate(img, seg_map, seg_seed):
 				for leaf_seg in adjacent_nodes[child_seg - 1]:
 					if leaf_seg in seg_new or leaf_seg in seg_choose:
 						continue
-					if np.linalg.norm(avg_color[leaf_seg - 1] - avg_color[child_seg - 1]) <= 		threshold:
+					if np.linalg.norm(avg_color[leaf_seg - 1] - avg_color[root_seg - 1]) <= 		threshold:
 						seg_new.add(leaf_seg)
 			for child_seg in seg_new:
 				seg_choose.add(child_seg)
@@ -131,13 +129,13 @@ def get_performance(img1, img2, label1=255, label2=255):
 def main():
 	dataset_name = 'Partial_REID'
 	input_dir = 'data/input/' + dataset_name + '/occluded'
-	input_dir = 'data/input/' + dataset_name + '/occlusion_label'
-	model_prefix = 'imagenet_cuhk01_square'
+	label_dir = 'data/input/' + dataset_name + '/occlusion_label'
+	model_prefix = 'imagenet_delicate_square'
 
-	idx_begin, idx_end = 1, 12
+	idx_begin, idx_end = 1, 21
 	label_occlusion, label_person, label_select = 255, 127, 255
-	flag_propagate = False
-	flag_export = False
+	flag_propagate = True
+	flag_export = True
 
 	for iter_time in range(idx_begin, idx_end):
 		model_name = model_prefix + '_' + str(iter_time) + 'w'
@@ -181,7 +179,7 @@ def main():
 			if flag_export:
 				img_output = fill_image(input_img, seg_map, heated_block)
 				path_output = os.path.join(output_dir, filename)
-				Image.fromarray(img_output, path_output)
+				Image.fromarray(img_output).save(path_output)
 
 			img_select = get_selection(input_img, seg_map, heated_block)
 			occlusion_rate = get_performance(img_select, label_img, label_select, label_occlusion)
